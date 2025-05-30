@@ -1,4 +1,5 @@
 
+// letter frequency  Object notation to model a Dictionary
 const POOL_OF_LETTERS = {
   'A': 9, 'B': 2, 'C': 2, 'D': 4, 'E': 12,
   'F': 2, 'G': 3, 'H': 2, 'I': 9, 'J': 1,
@@ -9,13 +10,14 @@ const POOL_OF_LETTERS = {
 
 export const computeCumulativeWeights = (letterPool) => {
   const cumulativeWeightsDict = {};
-  let totalWeight = 0;
+  let runningSum = 0;
 
-  for (const [letter, weight] of Object.entries(letterPool)) {
-    totalWeight += weight;
-    cumulativeWeightsDict[letter] = totalWeight;
+  for (const letter in letterPool) {
+    runningSum += letterPool[letter];
+    cumulativeWeightsDict[letter] = runningSum;
   }
-  return [cumulativeWeightsDict, totalWeight];
+  
+  return [cumulativeWeightsDict, runningSum];
 };
 
 
@@ -29,26 +31,29 @@ export const drawRandomNums = (maxNum) => {
   return Array.from(randomNums);
 };
 
-
+// Main Logic – Draw Letters
 export const drawLetters = () => {
+  // map numbers to specific letters
   const result = computeCumulativeWeights(POOL_OF_LETTERS);
   const cumulativeWeightsDict = result[0];
   const totalWeight = result[1];
 
-  let selectedLetters = [];
+  let letters = [];
   let randomNums = [];
 
+  // Draws 10 random numbers up to the total weight
   randomNums = drawRandomNums(totalWeight);
 
   for (const num of randomNums) {
-    for (const [letter, weight] of Object.entries(cumulativeWeightsDict)) {
-      if (num <= weight) {
-        selectedLetters.push(letter);
+    for (const letter of Object.keys(cumulativeWeightsDict)) {
+      const limit = cumulativeWeightsDict[letter];
+      if (num <= limit) {
+        letters.push(letter);
         break;
       }
     }
   }
-  return selectedLetters;
+  return letters;
 };
 
 export const usesAvailableLetters = (input, lettersInHand) => {
@@ -133,3 +138,4 @@ export const highestScoreFrom = (words) => {
 
   return { word: highestScoreWord, score: highestScore };
 };
+
